@@ -628,7 +628,7 @@ public class ApiCaller : MonoBehaviour
         json = JsonUtility.ToJson(_temp);
 
         Debug.Log(json);
-        var request = new UnityWebRequest(_Url + "/api/reward-list", "POST");
+        var request = new UnityWebRequest(_Url + "/api/redeem-history", "POST");
         request.SetRequestHeader("Authorization", "Bearer " + Userdata.Instance._User.data.access_token);
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
@@ -647,11 +647,88 @@ public class ApiCaller : MonoBehaviour
         else
         {
             Debug.Log("GET Reward : " + request.downloadHandler.text);
-            Userdata.RewardResponse data = new Userdata.RewardResponse();
-            data = JsonUtility.FromJson<Userdata.RewardResponse>(request.downloadHandler.text);
-            Userdata.Instance._RedeemHistoryData = data;
+            Userdata.RedeemResponse data = new Userdata.RedeemResponse();
+            data = JsonUtility.FromJson<Userdata.RedeemResponse>(request.downloadHandler.text);
+            Userdata.Instance._RedeemResponse = data;
 
             OnCall_GetRewardHistory_OK?.Invoke();
+        }
+
+    }
+
+    public GeneralDelegate OnCall_RedeemReward_OK;
+    public class _RedeemReward
+    {
+        public string product_id;
+    }
+
+
+
+    public IEnumerator _Redeem_Reward(int _ProductReward)
+    {
+
+        _RedeemReward _temp = new _RedeemReward();
+        _temp.product_id = _ProductReward.ToString();
+
+        json = JsonUtility.ToJson(_temp);
+
+        Debug.Log(json);
+        var request = new UnityWebRequest(_Url + "/api/redeem-reward", "POST");
+        request.SetRequestHeader("Authorization", "Bearer " + Userdata.Instance._User.data.access_token);
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = (UploadHandler)new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = (DownloadHandler)new DownloadHandlerBuffer();
+        request.SetRequestHeader("Accept", "application/json");
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+        Debug.Log("request responseText:" + request.downloadHandler.text);
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+
+            //OnCall_GetInventory_Failed?.Invoke();
+        }
+        else
+        {
+            Debug.Log("GET Reward : " + request.downloadHandler.text);
+             Userdata.RewardResponse_OK data = new Userdata.RewardResponse_OK();
+            data = JsonUtility.FromJson<Userdata.RewardResponse_OK>(request.downloadHandler.text);
+            Userdata.Instance._RewardResponse_OK = data;
+
+            //OnCall_GetRewardHistory_OK?.Invoke();
+            OnCall_RedeemReward_OK?.Invoke();
+        }
+
+    }
+
+    public GeneralDelegate OnCall_GetWorldData_OK;
+
+    public IEnumerator _GetWorldData()
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(_Url + "/api/game/world"))
+        {
+            Debug.Log("Call _GetWorldData");
+            www.SetRequestHeader("Authorization", "Bearer " + Userdata.Instance._User.data.access_token);
+            www.SetRequestHeader("Accept", "application/json");
+            www.SetRequestHeader("Content-Type", "application/json");
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.ProtocolError || www.result == UnityWebRequest.Result.ConnectionError)
+            {
+                Debug.LogError($"Error: {www.error}");
+                
+            }
+            else
+            {
+
+                Debug.Log("_GetWorldData : " + www.downloadHandler.text);
+                Userdata.GameWorldData data = new Userdata.GameWorldData();
+                data = JsonUtility.FromJson<Userdata.GameWorldData>(www.downloadHandler.text);
+                Userdata.Instance._WorldData = data;
+                OnCall_GetWorldData_OK?.Invoke();
+                //StartCoroutine(_AddItem(_ItemId, _CurrentUI));
+            }
         }
 
     }
