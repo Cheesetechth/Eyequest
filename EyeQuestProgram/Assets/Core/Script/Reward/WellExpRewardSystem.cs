@@ -117,9 +117,9 @@ public class WellExpRewardSystem : MonoBehaviour
     public TMPro.TextMeshProUGUI _Des;
     public TMPro.TextMeshProUGUI _Point;
 
-    public TMPro.TextMeshProUGUI _Confirm_Point;
-    public TMPro.TextMeshProUGUI _Confirm_Conditon;
-    public Image _Confirm_Product_Image;
+    //public TMPro.TextMeshProUGUI _Confirm_Point;
+    //public TMPro.TextMeshProUGUI _Confirm_Conditon;
+    //public Image _Confirm_Product_Image;
 
     public int _ProductId;
     public void _OpenPopUp(int _CurrentId)
@@ -130,8 +130,8 @@ public class WellExpRewardSystem : MonoBehaviour
         _Des.text = Userdata.Instance._RewardData.data[_CurrentId].description;
         _Point.text = Userdata.Instance._RewardData.data[_CurrentId].point.ToString();
 
-        _Confirm_Point.text = Userdata.Instance._RewardData.data[_CurrentId].point.ToString();
-        _Confirm_Conditon.text = Userdata.Instance._RewardData.data[_CurrentId].condition;
+        //_Confirm_Point.text = Userdata.Instance._RewardData.data[_CurrentId].point.ToString();
+        //_Confirm_Conditon.text = Userdata.Instance._RewardData.data[_CurrentId].condition;
 
         StartCoroutine(DownloadImage_Confirm(Userdata.Instance._RewardData.data[_CurrentId].product_image));
         StartCoroutine(DownloadImage(Userdata.Instance._RewardData.data[_CurrentId].product_image));
@@ -167,7 +167,7 @@ public class WellExpRewardSystem : MonoBehaviour
         {
             Texture2D downloadedTexture = DownloadHandlerTexture.GetContent(request);
             Sprite sprite = Sprite.Create(downloadedTexture, new Rect(0, 0, downloadedTexture.width, downloadedTexture.height), new Vector2(0.5f, 0.5f));
-            _Confirm_Product_Image.sprite = sprite;
+            //_Confirm_Product_Image.sprite = sprite;
         }
     }
 
