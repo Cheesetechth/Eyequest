@@ -16,6 +16,19 @@ public class WordLoader : MonoBehaviour
         public List<GameObject> _Star;
     }
 
+    public void OnEnable()
+    {
+        Userdata.Instance.gameObject.GetComponent<ApiCaller>().OnCall_BuyBooster_OK += () =>
+        {
+            _BuyBoosterOK();
+        };
+    }
+
+    public void OnDisable()
+    {
+        Userdata.Instance.gameObject.GetComponent<ApiCaller>().OnCall_BuyBooster_OK -= Userdata.Instance.gameObject.GetComponent<ApiCaller>().OnCall_BuyBooster_OK;
+    }
+
 
     public int _CurrentWorld;
 
@@ -84,8 +97,10 @@ public class WordLoader : MonoBehaviour
     public List<GameObject> _Star;
 
     public GameObject _LevelSelection;
+    public int _CurrentLevel;
     public void _OpenLevelPopUp(int _id)
     {
+        _CurrentLevel = _id;
         _LevelSelection.SetActive(true);
 
 
@@ -196,5 +211,103 @@ public class WordLoader : MonoBehaviour
         }
 
         Debug.Log("Check VV");
+    }
+
+
+    public GameObject _BoosterPanel;
+    public Button _BuyBoosterBtm;
+    public int _BoosterCurrent;
+    public void _BuyBooster()
+    {
+        Userdata.Instance._User.data.currency.gold -= 100;
+        StartCoroutine(Userdata.Instance.GetComponent<ApiCaller>()._AddCurreny(Userdata.Instance._User.data.currency.gold, 0));
+        switch (_BoosterCurrent)
+        {
+            case 0:
+                Userdata.Instance._User.data.booster.booster1 += 1;
+                break;
+            case 1:
+                Userdata.Instance._User.data.booster.booster2 += 1;
+                break;
+            case 2:
+                Userdata.Instance._User.data.booster.booster3 += 1;
+                break;
+            case 3:
+                Userdata.Instance._User.data.booster.booster4 += 1;
+                break;
+        }
+
+        StartCoroutine(Userdata.Instance.GetComponent<ApiCaller>()._BuyBooster(
+            Userdata.Instance._User.data.booster.booster1,
+            Userdata.Instance._User.data.booster.booster2,
+            Userdata.Instance._User.data.booster.booster3,
+            Userdata.Instance._User.data.booster.booster4));
+    }
+
+    public void _OpenBuyBooster(int _Id)
+    {
+        _BoosterCurrent = _Id;
+
+        if (Userdata.Instance._User.data.currency.gold < 100)
+        {
+            _BuyBoosterBtm.interactable = false;
+        }
+        else
+        {
+            _BuyBoosterBtm.interactable = true;
+        }
+    }
+
+    public void _BuyBoosterOK()
+    {
+        if (Userdata.Instance._User.data.booster.booster1 != 0)
+        {
+            _Booster_Toggle[0].SetActive(false);
+            _BoosterSlot[0].SetActive(true);
+            _BoosterSlot[0].transform.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = Userdata.Instance._User.data.booster.booster1.ToString();
+        }
+        else
+        {
+            _Booster_Toggle[0].SetActive(true);
+            _BoosterSlot[0].SetActive(false);
+        }
+
+        if (Userdata.Instance._User.data.booster.booster2 != 0)
+        {
+            _Booster_Toggle[1].SetActive(false);
+            _BoosterSlot[1].SetActive(true);
+            _BoosterSlot[1].transform.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = Userdata.Instance._User.data.booster.booster2.ToString();
+        }
+        else
+        {
+            _Booster_Toggle[1].SetActive(true);
+            _BoosterSlot[1].SetActive(false);
+        }
+
+        if (Userdata.Instance._User.data.booster.booster3 != 0)
+        {
+            _Booster_Toggle[2].SetActive(false);
+            _BoosterSlot[2].SetActive(true);
+            _BoosterSlot[2].transform.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = Userdata.Instance._User.data.booster.booster3.ToString();
+        }
+        else
+        {
+            _Booster_Toggle[2].SetActive(true);
+            _BoosterSlot[2].SetActive(false);
+        }
+
+        if (Userdata.Instance._User.data.booster.booster4 != 0)
+        {
+            _Booster_Toggle[3].SetActive(false);
+            _BoosterSlot[3].SetActive(true);
+            _BoosterSlot[3].transform.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = Userdata.Instance._User.data.booster.booster4.ToString();
+        }
+        else
+        {
+            _Booster_Toggle[3].SetActive(true);
+            _BoosterSlot[3].SetActive(false);
+        }
+
+        _BoosterPanel.SetActive(false);
     }
 }
